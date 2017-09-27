@@ -29,3 +29,20 @@ CREATE TABLE quiz.users (
 ENGINE=InnoDB
 DEFAULT CHARSET=latin1
 COLLATE=latin1_swedish_ci ;
+
+
+CREATE TABLE quiz.user_roles (
+	role_id INT NOT NULL AUTO_INCREMENT,
+	role_description varchar(100) NOT NULL,
+	role_status INT NOT NULL,
+	role_maker varchar(100) NOT NULL,
+	role_maker_date DATE NOT NULL,
+	role_maker_comment varchar(100) NOT NULL,
+	role_checker varchar(100) NULL,
+	role_checker_date DATE NULL,
+	role_checker_comment VARCHAR(100) NULL,
+	PRIMARY KEY(role_id)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci ;
