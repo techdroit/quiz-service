@@ -256,16 +256,11 @@ CREATE TABLE quiz.quiz_ques (
 	option_d_valid TINYINT UNSIGNED NOT NULL,
 	option_e_valid TINYINT UNSIGNED NOT NULL,
 	mk_id BIGINT UNSIGNED NOT NULL,
-	mk_date DATETIME NOT NULL,
+	mk_date TIMESTAMP NOT NULL,
 	mk_comment varchar(100) NULL,
-	lst_mk_id BIGINT UNSIGNED NULL,
-	lst_mk_date DATETIME null,
 	primary key(ques_id),
 	index mk_ind (mk_id),
-	index lst_mk_ind (lst_mk_id),
 	foreign key (mk_id) 
-	references quiz_users(user_id),
-	foreign key (lst_mk_id) 
 	references quiz_users(user_id),
 	foreign key (quiz_id) 
 	references quiz_info(quiz_id),
