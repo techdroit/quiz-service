@@ -1,4 +1,4 @@
-package com.techdroit.quizservice.status.alert;
+package com.techdroit.quizservice.alert.status;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

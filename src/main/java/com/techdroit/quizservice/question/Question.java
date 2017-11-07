@@ -24,6 +24,9 @@ public class Question implements Serializable{
 	@Column(name="quiz_id")
 	private long quizId;
 	
+	@Column(name="sect_id")
+	private long sectionId;
+	
 	@Column(name="ques_name")
 	private String questionName;
 	
@@ -92,6 +95,14 @@ public class Question implements Serializable{
 
 	public void setQuizId(long quizId) {
 		this.quizId = quizId;
+	}
+
+	public long getSectionId() {
+		return sectionId;
+	}
+
+	public void setSectionId(long sectionId) {
+		this.sectionId = sectionId;
 	}
 
 	public String getQuestionName() {
@@ -237,5 +248,4 @@ public class Question implements Serializable{
 	public void setMakerComment(String makerComment) {
 		this.makerComment = makerComment;
 	}
-	
 }

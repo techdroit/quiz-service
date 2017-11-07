@@ -28,6 +28,13 @@ public class QuestionDAO implements IQuestionDAO {
 		String hql = "FROM Question ques WHERE ques.quizId = ?";
 		return (List<Question>) entityManager.createQuery(hql).setParameter(1, quizId).getResultList();
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Question> getAllQuestionsByQuizIdAndSection(long quizId, long sectId){
+		String hql = "FROM Question ques WHERE ques.quizId = ? AND ques.sectionId = ?";
+		return (List<Question>) entityManager.createQuery(hql).setParameter(1, quizId).setParameter(2, sectId).getResultList();
+	}
 
 	@Override
 	public Question getQuestionById(long questionId) {

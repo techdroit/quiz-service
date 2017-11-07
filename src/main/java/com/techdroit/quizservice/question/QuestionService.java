@@ -22,6 +22,12 @@ public class QuestionService implements IQuestionService {
 		// TODO Auto-generated method stub
 		return questionDAO.getAllQuestionsByQuizId(quizId);
 	}
+	
+	@Override
+	public List<Question> getAllQuestionsByQuizIdAndSection(long quizId, long sectId) {
+		// TODO Auto-generated method stub
+		return questionDAO.getAllQuestionsByQuizIdAndSection(quizId, sectId);
+	}
 
 	@Override
 	public Question getQuestionById(long questionId) {

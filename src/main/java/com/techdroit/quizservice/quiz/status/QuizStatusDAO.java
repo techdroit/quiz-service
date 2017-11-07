@@ -1,4 +1,4 @@
-package com.techdroit.quizservice.status.alert;
+package com.techdroit.quizservice.quiz.status;
 
 import java.util.List;
 
@@ -10,17 +10,17 @@ import org.springframework.stereotype.Repository;
 
 @Transactional
 @Repository
-public class AlertStatusDAO implements IAlertStatusDAO {
+public class QuizStatusDAO implements IQuizStatusDAO {
 
 	@PersistenceContext
 	private EntityManager entityManager;
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<AlertStatus> getAllAlertStatus() {
+	public List<QuizStatus> getAllQuizStatus() {
 		// TODO Auto-generated method stub
-		String hql = "FROM AlertStatus";
-		return (List<AlertStatus>)entityManager.createQuery(hql).getResultList();
+		String hql = "FROM QuizStatus";
+		return (List<QuizStatus>)entityManager.createQuery(hql).getResultList();
 	}
 
 }

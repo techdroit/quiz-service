@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.google.gson.Gson;
 
 @Controller
 // @RequestMapping("quiz")
@@ -40,6 +37,13 @@ public class QuestionController {
 	@GetMapping("questions/{id}")
 	public ResponseEntity<List<Question>> getAllQuestionsByQuizId(@PathVariable("id") Long quizId) {
 		List<Question> list = questionService.getAllQuestionsByQuizId(quizId);
+		return new ResponseEntity<List<Question>>(list, HttpStatus.OK);
+	}
+	
+	@GetMapping("questions/{quizId}/{sectionId}")
+	public ResponseEntity<List<Question>> getAllQuestionsByQuizIdAndSection(@PathVariable("quizId") Long quizId,
+			@PathVariable("sectionId") Long sectionId) {
+		List<Question> list = questionService.getAllQuestionsByQuizIdAndSection(quizId, sectionId);
 		return new ResponseEntity<List<Question>>(list, HttpStatus.OK);
 	}
 
