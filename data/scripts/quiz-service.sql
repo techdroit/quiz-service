@@ -13,9 +13,9 @@ ENGINE=InnoDB
 DEFAULT CHARSET=latin1
 COLLATE=latin1_swedish_ci ;
 
-insert into quiz_ques_types(ques_type_name) values('true or false');
-insert into quiz_ques_types(ques_type_name) values('multi choice radio');
-insert into quiz_ques_types(ques_type_name) values('multi choice check');
+insert into quiz_ques_types(ques_type_name) values('TRUE OR FALSE');
+insert into quiz_ques_types(ques_type_name) values('MULTI CHOICE RADIO');
+insert into quiz_ques_types(ques_type_name) values('MULTI CHOICE CHECK');
 
 ------------------------------------------------------------------------------------------
 
@@ -33,6 +33,24 @@ COLLATE=latin1_swedish_ci ;
 
 insert into quiz_vis_mode(vis_mode_name) values('PRIVATE');
 insert into quiz_vis_mode(vis_mode_name) values('PUBLIC');
+
+------------------------------------------------------------------------------------------
+
+--This table indicates wether quiz questions appear to the user in a horizontal or vertical display mode or it can be toggle
+CREATE TABLE quiz.quiz_ques_dis_mode (
+	dis_mode_id TINYINT NOT NULL AUTO_INCREMENT,
+	dis_mode_name varchar(25) NOT NULL,
+	dis_mode_desc varchar(25),
+	primary key(dis_mode_id),
+	UNIQUE(dis_mode_name)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci ;
+
+insert into quiz_ques_dis_mode(dis_mode_name) values('HORIZONTAL');
+insert into quiz_ques_dis_mode(dis_mode_name) values('VERTICAL');
+--insert into quiz_ques_dis_mode(dis_mode_name) values('');
 
 ------------------------------------------------------------------------------------------
 
@@ -149,8 +167,9 @@ insert into quiz_alert_status(status_name) values('DISABLED');
 
 CREATE TABLE quiz.quiz_users (
 	user_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	user_name varchar(50) NOT NULL,
 	email varchar(50) NOT NULL,
-	user_pwd varchar(100) NOT NULL,
+	user_pwd varchar(1000) NOT NULL,
 	first_name varchar(50) NOT NULL,
 	last_name varchar(50) NOT NULL,
 	middle_name varchar(50),
@@ -172,7 +191,10 @@ CREATE TABLE quiz.quiz_users (
 	img_path varchar(100),
 	email_alert TINYINT unsigned NOT NULL,
 	sms_alert TINYINT unsigned NOT NULL,
+	last_login DATETIME,
+	last_logout DATETIME,
 	primary KEY(user_id),
+	UNIQUE(user_name),
 	UNIQUE(email),
 	foreign key (status_id) 
 	references quiz_user_status (status_id),
@@ -187,10 +209,19 @@ ENGINE=InnoDB
 DEFAULT CHARSET=latin1
 COLLATE=latin1_swedish_ci;
 
+INSERT INTO quiz_users(user_name, email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
+VALUES('kukut', 'teslimkuku@gmail.com','admin','Teslim','Kuku','2017-09-30 10:23:00',1,2,1,1);
+
+INSERT INTO quiz_users(user_name, email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
+VALUES('kazeem101', 'kazeem.olawale@yahoo.com','8uuyrtey','Kazeem','Olawale','2017-09-30 10:23:00',1,1,1,1);
+
+INSERT INTO quiz_users(user_name, email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
+VALUES('azeez242', 'azeez_layi@gmail.com','asxde4567','Azeez','Layi','2017-09-30 10:23:00',1,1,1,1);
+
 ------------------------------------------------------------------------------------------
 
 CREATE TABLE quiz.quiz_users_admin (
-	user_id BIGINT UNSIGNED NOT NULL,
+	user_id BIGINT UNSIGNED,
 	admin_id BIGINT UNSIGNED,
 	index user_ind(user_id),
 	index adm_ind(admin_id),
@@ -203,6 +234,11 @@ CREATE TABLE quiz.quiz_users_admin (
 ENGINE=InnoDB
 DEFAULT CHARSET=latin1
 COLLATE=latin1_swedish_ci;
+
+--admin_id is the admin for user, user_id. That means the admin created the users
+
+insert into quiz_users_admin(user_id,admin_id) values(2,1);
+insert into quiz_users_admin(user_id,admin_id) values(3,1);
 
 ------------------------------------------------------------------------------------------
 
@@ -226,8 +262,10 @@ CREATE TABLE quiz.quiz_info (
 	mk_comment varchar(100),
 	PRIMARY KEY(quiz_id),
 	index mk_ind (mk_id),
-	foreign key (mk_id) 
+	foreign key (mk_id)
 	references quiz_users (user_id),
+	foreign key (dis_mode_id) 
+	references quiz_ques_dis_mode (dis_mode_id),
 	foreign key (sel_mode_id) 
 	references quiz_ques_sel_mode (sel_mode_id),
 	foreign key (vis_mode_id) 
@@ -236,6 +274,8 @@ CREATE TABLE quiz.quiz_info (
 ENGINE=InnoDB
 DEFAULT CHARSET=latin1
 COLLATE=latin1_swedish_ci ;
+
+INSERT INTO quiz_info(quiz_name,status_id,vis_mode_id,mk_id,mk_date) VALUES('Android',1,1,1,'2017-09-30 10:23:00');
 
 ------------------------------------------------------------------------------------------
 
@@ -276,10 +316,13 @@ CREATE TABLE quiz.quiz_sections (
 ENGINE=InnoDB
 DEFAULT CHARSET=latin1
 COLLATE=latin1_swedish_ci ;	
+
+INSERT INTO quiz_sections(sect_name,mk_date) VALUES('General Knowledge','2017-09-30 10:23:00');
 ------------------------------------------------------------------------------------------
 
 CREATE TABLE quiz.quiz_ques (
 	ques_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	ques_code varchar(100) NOT NULL,
 	quiz_id BIGINT UNSIGNED,
 	sect_id BIGINT UNSIGNED,
 	ques_name varchar(1000) NOT NULL,
@@ -301,6 +344,7 @@ CREATE TABLE quiz.quiz_ques (
 	mk_date TIMESTAMP NOT NULL,
 	mk_comment varchar(100),
 	primary key(ques_id),
+	UNIQUE(ques_code),
 	index mk_ind (mk_id),
 	foreign key (mk_id) 
 	references quiz_users(user_id),
@@ -432,6 +476,48 @@ DEFAULT CHARSET=latin1
 COLLATE=latin1_swedish_ci;
 
 ------------------------------------------------------------------------------------------
+
+CREATE TABLE quiz.quiz_user_events (
+	event_id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	event_name varchar(50) NOT NULL,
+	mk_id BIGINT UNSIGNED,
+	mk_date DATETIME NOT NULL,
+	mk_comment varchar(100),
+	primary key(event_id),
+	foreign key (mk_id) 
+	references quiz_users(user_id)
+	on delete CASCADE
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci;
+
+insert into quiz_user_events(event_name,mk_id,mk_date) values('OTHER',1,'2017-09-30 10:23:00');
+insert into quiz_user_events(event_name,mk_id,mk_date) values('LOGIN',1,'2017-09-30 10:23:00');
+insert into quiz_user_events(event_name,mk_id,mk_date) values('LOGOUT',1,'2017-09-30 10:23:00');
+
+------------------------------------------------------------------------------------------
+
+CREATE TABLE quiz.quiz_user_trail (
+	user_id BIGINT UNSIGNED NOT NULL,
+	event_id TINYINT UNSIGNED DEFAULT 1,
+	event_date DATETIME NOT NULL,
+	ip_address varchar(50) NOT NULL,
+	mac_address varchar(50),
+	event_ref varchar(100),
+	event_comment varchar(1000),
+	index user_ind (user_id),
+	foreign key (user_id) 
+	references quiz_users(user_id)
+	on delete CASCADE,
+	foreign key (event_id) 
+	references quiz_user_events(event_id)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci;
+
+------------------------------------------------------------------------------------------
 select * from quiz_alert_status;
 
 select * from quiz_user_roles;
@@ -456,49 +542,6 @@ select * from quiz_user_grps_membrs;
 select * from quiz_user_grps_quiz;
 
 select * from quiz_sections;
-
-
-INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
-VALUES('teslimkuku@gmail.com','admin','Teslim','Kuku','2017-09-30 10:23:00',1,2,1,1);
-
-INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
-VALUES('kazeem.olawale@yahoo.com','8uuyrtey','Kazeem','Olawale','2017-09-30 10:23:00',1,1,1,1);
-
-INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
-VALUES('azeez_layi@gmail.com','asxde4567','Azeez','Layi','2017-09-30 10:23:00',1,1,1,1);
-
-INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
-VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
-
-INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
-VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
-
-INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
-VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
-
-INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
-VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
-
-INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
-VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
-
-INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
-VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
-
-INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
-VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
-
-INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
-VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
-
-insert into quiz_users_admin(user_id,admin_id) values(2,1);
-insert into quiz_users_admin(user_id,admin_id) values(3,1);
-
-
-INSERT INTO quiz_ques(quiz_id, sect_id, ques_name, status_id, ques_type_id, diff_level_id, option_a, option_b, 
-					  option_c, option_d, option_e, option_a_valid, option_b_valid, option_c_valid, 
-					  option_d_valid, option_e_valid,mk_id,mk_date)
-VALUES(1,1,'',1,2,1,'','','','','',2,2,2,2,2,1,'2017-09-30 10:23:00');
 
 INSERT INTO quiz_ques(quiz_id, sect_id, ques_name, status_id, ques_type_id, diff_level_id, option_a, option_b, 
 					  option_c, option_d, option_e, option_a_valid, option_b_valid, option_c_valid, 
@@ -567,3 +610,34 @@ INSERT INTO quiz_ques(quiz_id, sect_id, ques_name, status_id, ques_type_id, diff
 					  option_c, option_d, option_e, option_a_valid, option_b_valid, option_c_valid, 
 					  option_d_valid, option_e_valid,mk_id,mk_date)
 VALUES(1,1,'The corresponding name for the Android version, Android 1.5 is _____.',1,2,1,'','Cupcake','','','',2,1,2,2,2,1,'2017-09-30 10:23:00');
+
+
+INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
+VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
+
+INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
+VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
+
+INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
+VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
+
+INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
+VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
+
+INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
+VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
+
+INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
+VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
+
+INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
+VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
+
+INSERT INTO quiz_users(email, user_pwd, first_name, last_name, date_of_reg, status_id, role_id, email_alert, sms_alert) 
+VALUES('','','','','2017-09-30 10:23:00',1,1,1,1);
+
+
+INSERT INTO quiz_ques(quiz_id, sect_id, ques_name, status_id, ques_type_id, diff_level_id, option_a, option_b, 
+					  option_c, option_d, option_e, option_a_valid, option_b_valid, option_c_valid, 
+					  option_d_valid, option_e_valid,mk_id,mk_date)
+VALUES(1,1,'',1,2,1,'','','','','',2,2,2,2,2,1,'2017-09-30 10:23:00');

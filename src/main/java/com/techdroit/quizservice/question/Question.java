@@ -21,6 +21,9 @@ public class Question implements Serializable{
 	@Column(name="ques_id")
 	private long questionId;
 	
+	@Column(name="ques_code")
+	private String questionCode;
+	
 	@Column(name="quiz_id")
 	private long quizId;
 	
@@ -87,6 +90,14 @@ public class Question implements Serializable{
 
 	public void setQuestionId(long questionId) {
 		this.questionId = questionId;
+	}
+
+	public String getQuestionCode() {
+		return questionCode;
+	}
+
+	public void setQuestionCode(String questionCode) {
+		this.questionCode = questionCode;
 	}
 
 	public long getQuizId() {
