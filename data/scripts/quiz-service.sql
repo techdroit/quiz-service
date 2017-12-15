@@ -149,8 +149,9 @@ insert into quiz_alert_status(status_name) values('DISABLED');
 
 CREATE TABLE quiz.quiz_users (
 	user_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	user_name varchar(50) NOT NULL,
 	email varchar(50) NOT NULL,
-	user_pwd varchar(100) NOT NULL,
+	user_pwd varchar(1000) NOT NULL,
 	first_name varchar(50) NOT NULL,
 	last_name varchar(50) NOT NULL,
 	middle_name varchar(50),
@@ -172,6 +173,8 @@ CREATE TABLE quiz.quiz_users (
 	img_path varchar(100),
 	email_alert TINYINT unsigned NOT NULL,
 	sms_alert TINYINT unsigned NOT NULL,
+	last_login DATETIME,
+	last_logout DATETIME,
 	primary KEY(user_id),
 	UNIQUE(email),
 	foreign key (status_id) 
@@ -237,6 +240,8 @@ ENGINE=InnoDB
 DEFAULT CHARSET=latin1
 COLLATE=latin1_swedish_ci ;
 
+INSERT INTO quiz_info(quiz_name,status_id,vis_mode_id,mk_id,mk_date) VALUES('Android',1,1,1,'2017-09-30 10:23:00');
+
 ------------------------------------------------------------------------------------------
 
 --This table contains values that represent the different states of a particular question option
@@ -276,6 +281,8 @@ CREATE TABLE quiz.quiz_sections (
 ENGINE=InnoDB
 DEFAULT CHARSET=latin1
 COLLATE=latin1_swedish_ci ;	
+
+INSERT INTO quiz_sections(sect_name,mk_date) VALUES('General Knowledge','2017-09-30 10:23:00');
 ------------------------------------------------------------------------------------------
 
 CREATE TABLE quiz.quiz_ques (
@@ -426,6 +433,48 @@ CREATE TABLE quiz.quiz_user_grps_quiz (
 	references quiz_user_grps(grp_id),
 	foreign key (quiz_id) 
 	references quiz_info(quiz_id)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci;
+
+------------------------------------------------------------------------------------------
+
+CREATE TABLE quiz.quiz_user_events (
+	event_id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	event_name varchar(50) NOT NULL,
+	mk_id BIGINT UNSIGNED,
+	mk_date DATETIME NOT NULL,
+	mk_comment varchar(100),
+	primary key(event_id),
+	foreign key (mk_id) 
+	references quiz_users(user_id)
+	on delete CASCADE
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=latin1
+COLLATE=latin1_swedish_ci;
+
+insert into quiz_user_events(event_name,mk_id,mk_date) values('OTHER',1,'2017-09-30 10:23:00');
+insert into quiz_user_events(event_name,mk_id,mk_date) values('LOGIN',1,'2017-09-30 10:23:00');
+insert into quiz_user_events(event_name,mk_id,mk_date) values('LOGOUT',1,'2017-09-30 10:23:00');
+
+------------------------------------------------------------------------------------------
+
+CREATE TABLE quiz.quiz_user_trail (
+	user_id BIGINT UNSIGNED NOT NULL,
+	event_id TINYINT UNSIGNED DEFAULT 1,
+	event_date DATETIME NOT NULL,
+	ip_address varchar(50) NOT NULL,
+	mac_address varchar(50),
+	event_ref varchar(100),
+	event_comment varchar(1000),
+	index user_ind (user_id),
+	foreign key (user_id) 
+	references quiz_users(user_id)
+	on delete CASCADE,
+	foreign key (event_id) 
+	references quiz_user_events(event_id)
 )
 ENGINE=InnoDB
 DEFAULT CHARSET=latin1
